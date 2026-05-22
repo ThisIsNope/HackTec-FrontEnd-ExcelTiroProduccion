@@ -169,16 +169,10 @@
         function toggleCompanyFields() {
             const userType = document.getElementById('user-type').value;
             const companyForm = document.getElementById('info-para-empresa');
-            
-            // Obtener campos dentro de la empresa para requerirlos solo si está visible
-            const companyInputs = companyForm.querySelectorAll('input, textarea');
-
             if (userType === 'empresa') {
                 companyForm.style.display = 'block';
-                companyInputs.forEach(input => input.required = (input.id !== 'website')); // Hacemos website opcional
             } else {
                 companyForm.style.display = 'none';
-                companyInputs.forEach(input => input.required = false);
             }
         }
     </script>
