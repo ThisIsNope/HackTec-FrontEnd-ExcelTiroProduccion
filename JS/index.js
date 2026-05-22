@@ -62,8 +62,8 @@ function agregarCotizacion(idProducto, nombre, precio) {
 }
 
 function actualizarCotizador() {
-    const contenedor = document.querySelector(".card.shadow-sm.p-3 .text-center");
-    const subtotalEl = document.querySelector(".d-flex.justify-content-between.mb-2 .fw-bold");
+    const contenedor = document.getElementById("cotizacion-lista");
+    const subtotalEl = document.getElementById("subtotal");
 
     if (cotizacion.length === 0) {
         contenedor.innerHTML = `<p class="text-muted small">No hay lotes seleccionados</p>`;
