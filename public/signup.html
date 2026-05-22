@@ -7,6 +7,12 @@
 </head>
 <body>
     <h1>Registrarse</h1>
+
+    <select id="user-type" onchange="toggleCompanyFields()" required>
+        <option value="particular">Particular</option>
+        <option value="empresa">Empresa</option>
+    </select>
+
     <form id="signup-form" onsubmit="handleSignup(event)">
         <p>Nombre</p>
         <input type="text" id="nombre" placeholder="Nombre" required><br><br>
@@ -27,6 +33,31 @@
         <p>Dirección</p>
         <input type="text" id="address" placeholder="Dirección" required><br><br>
     </form>
+    <form id="info-para-empresa" style="display: none;">
+        <p>RFC</p>
+        <input type="text" id="rfc" placeholder="RFC" required><br><br>
+        <p>Razón Social</p>
+        <input type="text" id="business-name" placeholder="Razón Social" required><br><br>
+        <p>Giro</p>
+        <input type="text" id="business-type" placeholder="Giro" required><br><br>
+        <p>Pagina Web</p>
+        <input type="text" id="website" placeholder="Pagina Web"><br><br>
+        <p>Descripción de la Empresa</p>
+        <textarea id="business-description" placeholder="Descripción de la Empresa" required></textarea><br><br>
+    </form>
+    <button type="submit" form="signup-form">Registrarse</button>
     <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+
+    <script>
+        function toggleCompanyFields() {
+            const userType = document.getElementById('user-type').value;
+            const companyForm = document.getElementById('info-para-empresa');
+            if (userType === 'empresa') {
+                companyForm.style.display = 'block';
+            } else {
+                companyForm.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
