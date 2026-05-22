@@ -12,8 +12,8 @@
         <a href="../public/index.html" class="btn btn-light border shadow-sm rounded-pill fw-bold px-4 mb-4 text-dark text-decoration-none">← Volver al inicio</a>
         
         <div class="row g-4">
-            <!-- Columna Izquierda: Formulario -->
-            <div class="col-lg-7">
+        
+            <div>
                 <section id="view-producer" class="card shadow-sm border-0 rounded-4 h-100">
                     <div class="card-body p-4 p-md-5">
                         <h3 class="fw-bold mb-4" style="color: var(--primary-green);">Panel de Productor</h3>
@@ -119,32 +119,6 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Columna Derecha: Billetera -->
-            <div class="col-lg-5">
-                <section id="green-wallet" class="card shadow-sm border-0 rounded-4 h-100 wallet-card">
-                    <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-center">
-                        <h3 class="fw-bold mb-4 text-center">Billetera ROCEEL</h3>
-                        
-                        <div class="wallet-tabs">
-                            <div class="wallet-tab active" onclick="switchWalletTab('monetary')" id="tab-monetary">Saldo $MXN</div>
-                            <div class="wallet-tab" onclick="switchWalletTab('eco')" id="tab-eco">Eco-Créditos</div>
-                        </div>
-                        
-                        <div id="view-monetary" class="text-center py-4">
-                            <p class="mb-1 opacity-75">Disponible para retiro:</p>
-                            <div class="wallet-balance">$14,500.00</div>
-                            <button class="btn btn-light rounded-pill fw-bold w-100 mt-4 text-success shadow-sm py-2">Transferir a cuenta bancaria (SPEI)</button>
-                        </div>
-                        
-                        <div id="view-eco" class="text-center py-4" style="display: none;">
-                            <p class="mb-1 opacity-75">Tokens de Sostenibilidad:</p>
-                            <div class="wallet-balance text-warning">4,200 🌱</div>
-                            <p class="small opacity-75 mt-3 mb-0">Ganados por: Reducción de mermas (Octubre)</p>
-                        </div>
                     </div>
                 </section>
             </div>
