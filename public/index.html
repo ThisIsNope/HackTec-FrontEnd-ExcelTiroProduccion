@@ -51,20 +51,13 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Tipo de Productor</label>
-                            <select class="form-select form-select-sm">
-                                <option>Cooperativa</option>
-                                <option>Independiente</option>
+                            <select class="form-select form-select-sm" id="filter-tipo-productor">
+                                <option value="todos">Todos</option>
+                                <option value="empresa">Empresa</option>
+                                <option value="particular">Particular</option>
                             </select>
                         </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="ecoCert">
-                            <label class="form-check-label small" for="ecoCert">Certificación Ecológica</label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="fastDel">
-                            <label class="form-check-label small" for="fastDel">Entrega Inmediata</label>
-                        </div>
-                        <button class="btn btn-primary w-100 btn-sm rounded-pill">Aplicar Filtros</button>
+                        <button class="btn btn-primary w-100 btn-sm rounded-pill" onclick="aplicarFiltros()">Aplicar Filtros</button>
                     </div>
                 </aside>
 

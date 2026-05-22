@@ -65,19 +65,21 @@ function actualizarCotizador() {
     const contenedor = document.querySelector(".card.shadow-sm.p-3 .text-center");
     const subtotalEl = document.querySelector(".d-flex.justify-content-between.mb-2 .fw-bold");
 
-    // Renderizar lista
     if (cotizacion.length === 0) {
-        contenedor.innerHTML = `<p>No hay lotes seleccionados</p>`;
+        contenedor.innerHTML = `<p class="text-muted small">No hay lotes seleccionados</p>`;
     } else {
         contenedor.innerHTML = cotizacion.map(p => `
-            <div class="d-flex justify-content-between mb-1 small">
+            <div class="d-flex justify-content-between align-items-center mb-2 small">
                 <span>${p.nombre}</span>
-                <span class="fw-bold">${p.precio ? '$' + p.precio.toLocaleString() : 'Trueque'}</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold">${p.precio ? '$' + p.precio.toLocaleString() : 'Trueque'}</span>
+                    <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0"
+                        onclick="quitarCotizacion(${p.idProducto})">✕</button>
+                </div>
             </div>
         `).join("");
     }
 
-    // Calcular subtotal
     const subtotal = cotizacion.reduce((acc, p) => acc + (p.precio || 0), 0);
     subtotalEl.innerText = `$${subtotal.toLocaleString()}`;
 }
@@ -115,4 +117,24 @@ async function generarOrden() {
 function logout() {
     sessionStorage.clear();
     window.location.href = "login.html";
+}
+
+async function aplicarFiltros() {
+    const tipo = document.getElementById("filter-tipo-productor").value;
+    try {
+        const res = await fetch(`${API_URL}/productos/filtro?tipo=${tipo}`, {
+            headers: { "ngrok-skip-browser-warning": "true" }
+        });
+        const data = await res.json();
+        if (data.ok) {
+            renderProductos(data.productos);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function quitarCotizacion(idProducto) {
+    cotizacion = cotizacion.filter(p => p.idProducto !== idProducto);
+    actualizarCotizador();
 }
