@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informacion de usuario</title>
+</head>
+
+<body>
+    <a href="index.html">← Volver al inicio</a>
+    <div id="user-info">
+        <h2>Información del Usuario</h2>
+        <p><strong>Nombre:</strong> Juan Pérez</p>
+        <p><strong>Rol:</strong> Productor</p>
+        <p><strong>Ubicación:</strong> Ciudad de México</p>
+        <p><strong>Productos Activos:</strong> 5</p>
+        <button onclick="editUserInfo()">Editar Información</button>
+    </div>
+    <div id="edit-form" style="display:none;">
+        <h3>Editar Información del Usuario</h3>
+        <form onsubmit="saveUserInfo(event)">
+            <input type="text" id="edit-name" placeholder="Nombre" required>
+            <input type="text" id="edit-role" placeholder="Rol" required>
+            <input type="text" id="edit-location" placeholder="Ubicación" required>
+            <input type="text" id="edit-email" placeholder="Correo Electrónico" required>
+            <input type="text" id="edit-phone" placeholder="Número de Teléfono" required>
+            <input type="password" id="edit-password" placeholder="Contraseña" required>
+            <input type="password" id="edit-confirm-password" placeholder="Confirmar Contraseña" required>
+            <button type="submit">Guardar Cambios</button>
+        </form>
+
+
+</body>
+
+</html>

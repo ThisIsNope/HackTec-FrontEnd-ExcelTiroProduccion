@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "express": "^5.2.1"
+  },
+  "name": "hacktec-frontend-exceltiroproduccion",
+  "version": "1.0.0",
+  "description": "Frontend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThisIsNope/HackTec-FrontEnd-ExcelTiroProduccion.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ThisIsNope/HackTec-FrontEnd-ExcelTiroProduccion/issues"
+  },
+  "homepage": "https://github.com/ThisIsNope/HackTec-FrontEnd-ExcelTiroProduccion#readme"
+}
