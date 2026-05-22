@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+</head>
+<body>
+    <h1>Registrarse</h1>
+    <form id="signup-form" onsubmit="handleSignup(event)">
+        <p>Nombre</p>
+        <input type="text" id="nombre" placeholder="Nombre" required><br><br>
+        <p>Apellido Paterno</p>
+        <input type="text" id="last-name" placeholder="Apellido Paterno" required><br><br>
+        <p>Apellido Materno</p>
+        <input type="text" id="middle-name" placeholder="Apellido Materno" required><br><br>
+        <p>Correo Electrónico</p>
+        <input type="email" id="email" placeholder="Correo Electrónico" required><br><br>
+        <p>Número de Teléfono</p>
+        <input type="tel" id="phone" placeholder="Número de Teléfono" required><br><br>
+        <p>Contraseña</p>
+        <input type="password" id="new-password" placeholder="Contraseña" required><br><br>
+        <p>Confirmar Contraseña</p>
+        <input type="password" id="confirm-password" placeholder="Confirmar Contraseña" required><br><br>   
+        <p>Ciudad</p>
+        <input type="text" id="city" placeholder="Ciudad" required><br><br>
+        <p>Dirección</p>
+        <input type="text" id="address" placeholder="Dirección" required><br><br>
+    </form>
+    <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+</body>
+</html>

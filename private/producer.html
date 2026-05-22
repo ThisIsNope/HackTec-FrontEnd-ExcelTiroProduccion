@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>>Conecta Local - Productor</title>
+</head>
+<body>
+    <a href="../index.html">← Volver al inicio</a>
+    <section id="view-producer" class="app-view">
+        <h2 style="color: var(--primary-dark);">Panel de Productor</h2>
+        
+        <!-- 1. Módulo de Carga Avanzado (Wizard) -->
+        <form id="product-form" onsubmit="handleFormSubmit(event)">
+            
+            <!-- Paso 1 -->
+            <div id="step-1" class="wizard-step active">
+                <h3>Paso 1: ¿Qué vas a registrar?</h3>
+                
+                <button type="button" class="secondary" onclick="document.getElementById('product-image').click()" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    📷 Capturar Foto del Lote
+                </button>
+                <input type="file" id="product-image" accept="image/*" capture="environment" style="display:none;">
+                
+                <label>Categoría / Tipo:</label>
+                <select id="category" required>
+                    <option value="frutas">🍎 Frutas</option>
+                    <option value="verduras">🥦 Verduras</option>
+                    <option value="madera">🪵 Madera</option>
+                    <option value="textil">🧶 Textil</option>
+                </select>
+                <input type="text" id="product-name" placeholder="Nombre específico (Ej: Manzana Golden)" required>
+                <input type="text" id="product-description" placeholder="Descripción del producto" required>
+                
+                <button type="button" onclick="goToStep(2)">Siguiente →</button>
+            </div>
+
+            <!-- Paso 2 -->
+            <div id="step-2" class="wizard-step">
+                <h3>Paso 2: Volumen y Valor</h3>
+                
+                <label for="transaction-type">Tipo de transacción:</label>
+                <select id="transaction-type" onchange="togglePriceField()" required>
+                    <option value="venta">Venta</option>
+                    <option value="trueque">Trueque</option>
+                </select>
+                
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="quantity" placeholder="Volumen/Masa" style="flex: 2;" required>
+                    <select id="unit" style="flex: 1;">
+                        <option value="kg">Kg</option>
+                        <option value="ton">Ton</option>
+                        <option value="cajas">Cajas</option>
+                    </select>
+                </div>
+
+                <div id="price-container">
+                    <label>Precio Justo ($MXN):</label>
+                    <input type="number" id="price" placeholder="Precio unitario" oninput="showPriceSuggestion()" required>
+                    <p id="price-suggestion" style="color: #666; font-size: 14px; margin-top: -10px; min-height: 20px;"></p>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="secondary" onclick="goToStep(1)">← Atrás</button>
+                    <button type="button" onclick="goToStep(3)">Siguiente →</button>
+                </div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div id="step-3" class="wizard-step">
+                <h3>Paso 3: Trazabilidad</h3>
+                <p>Captura el lugar exacto de origen para garantizar la trazabilidad inmutable del lote.</p>
+                
+                <input type="text" id="location" placeholder="Ubicación (Ej: Ciudad de México)" required>
+                
+                <button type="button" class="secondary" onclick="captureGPS()" id="btn-gps">📍 Obtener Coordenadas GPS</button>
+                <p id="gps-status" style="font-size: 14px; color: var(--primary-dark); font-weight: bold;"></p>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="secondary" onclick="goToStep(2)">← Atrás</button>
+                    <button type="submit" id="btn-submit">Guardar y Generar QR</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- 2. Generador de Trazabilidad (Modal QR) -->
+        <div id="qr-modal">
+            <h2 style="color: #28a745;">¡Lote Registrado Exitosamente!</h2>
+            <p id="qr-product-name-display" style="font-size: 18px; margin-bottom: 5px;"></p>
+            <p>ID: <span id="lote-id-text"></span></p>
+            <img id="qr-code-img" src="" alt="QR Trazabilidad">
+            <div style="padding: 20px;">
+                <button onclick="shareOnWhatsApp()" style="background: #25D366;">📲 Compartir por WhatsApp</button>
+                <button onclick="downloadQR()">Descargar QR</button>
+                <button onclick="document.getElementById('qr-modal').style.display='none'" class="secondary">Cerrar</button>
+            </div>
+        </div>
+
+        <!-- 3. Billetera Verde -->
+        <section id="green-wallet">
+            <div class="wallet-card">
+                <h2>Billetera ROCEEL</h2>
+                <div class="wallet-tabs">
+                    <div class="wallet-tab active" onclick="switchWalletTab('monetary')" id="tab-monetary">Saldo $MXN</div>
+                    <div class="wallet-tab" onclick="switchWalletTab('eco')" id="tab-eco">Eco-Créditos</div>
+                </div>
+                
+                <div id="view-monetary">
+                    <p style="margin:0;">Disponible para retiro:</p>
+                    <div class="wallet-balance">$14,500.00 MXN</div>
+                    <button style="background: rgba(255,255,255,0.2); border: 1px solid white;">Transferir a cuenta bancaria (SPEI)</button>
+                </div>
+                
+                <div id="view-eco" style="display: none;">
+                    <p style="margin:0;">Tokens de Sostenibilidad:</p>
+                    <div class="wallet-balance">4,200 🌱</div>
+                    <p style="font-size: 12px;">Ganados por: Reducción de mermas (Octubre)</p>
+                </div>
+            </div>
+            
+           
+        </section>
+    </section>
+
+    <script src="producer.js"></script>
+</body>
+</html>

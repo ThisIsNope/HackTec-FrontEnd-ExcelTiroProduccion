@@ -7,19 +7,6 @@
     <title>Conecta Local - Roceel</title>
     <!-- Importar Chart.js para el Tablero Verde -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Estilos básicos para layout - te sugiero moverlos a un archivo CSS luego */
-        .dashboard-container { display: flex; gap: 20px; margin-top: 20px; }
-        .column-left { width: 25%; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-        .column-center { width: 50%; }
-        .column-right { width: 25%; background: #f4fce8; padding: 15px; border-radius: 8px; border: 1px solid #c3e6cb; }
-        .kpi-container { display: flex; gap: 20px; margin-bottom: 20px; }
-        .kpi-card { flex: 1; padding: 20px; background: #e8f5e9; border-radius: 8px; text-align: center; }
-        .kpi-card h3 { margin: 0; color: #155724; font-size: 24px; }
-        .timeline { border-left: 2px solid #28a745; padding-left: 20px; margin-top: 20px; }
-        .timeline-node { margin-bottom: 15px; position: relative; }
-        .timeline-node::before { content: ''; position: absolute; left: -26px; top: 0; width: 10px; height: 10px; background: #28a745; border-radius: 50%; }
-    </style>
 </head>
 
 <body>
@@ -28,16 +15,16 @@
         <a href="#home">Inicio</a>
         <a href="#about">Acerca de</a>
         <a href="#contact">Contacto</a>
-        <a href="#login">Iniciar Sesión</a>
-        <a href="#register">Registrarse</a> 
+        <a href="login.html">Iniciar Sesión</a>
+        <a href="signup.html">Registrarse</a> 
         <a href="private/user.html">Mi Cuenta</a>
         <a href="#" onclick="logout()">Salir</a>
     </div>
     <div id="side-menu">
         <li>Viendo como:
             <button onclick="window.location.href='index.html'">Comprador - Trading</button>
-            <button onclick="window.location.href='producer.html'">Productor</button>
-            <button onclick="window.location.href='collaborative-logistics.html'">Colaborador Logistico</button>
+            <button onclick="window.location.href='private/producer.html'">Productor</button>
+            <button onclick="window.location.href='private/collaborative-logistics.html'">Colaborador Logistico</button>
         </li>
     </div>
 
@@ -59,7 +46,7 @@
                 <label><input type="checkbox"> Certificación Ecológica</label><br>
                 <label><input type="checkbox"> Entrega Inmediata</label><br><br>
                 
-                <label>Volumen mínimo (Ton):</label>
+                <label>Volumen mínimo (kg):</label>
                 <input type="number" placeholder="Ej. 5" style="width:100%">
             </aside>
 
