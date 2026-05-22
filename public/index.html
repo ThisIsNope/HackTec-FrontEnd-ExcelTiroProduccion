@@ -7,146 +7,139 @@
     <title>Conecta Local - Roceel</title>
     <!-- Importar Chart.js para el Tablero Verde -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
-    <h1>Conecta Local - Roceel</h1>
-    <div id="nav-bar">
-        <a href="#home">Inicio</a>
-        <a href="#about">Acerca de</a>
-        <a href="#contact">Contacto</a>
-        <a href="login.html">Iniciar Sesión</a>
-        <a href="signup.html">Registrarse</a> 
-        <a href="private/user.html">Mi Cuenta</a>
-        <a href="#" onclick="logout()">Salir</a>
-    </div>
-    <div id="side-menu">
-        <li>Viendo como:
-            <button onclick="window.location.href='index.html'">Comprador - Trading</button>
-            <button onclick="window.location.href='private/producer.html'">Productor</button>
-            <button onclick="window.location.href='private/collaborative-logistics.html'">Colaborador Logistico</button>
-        </li>
-    </div>
-
-    <hr>
-
-    <!-- 1. Marketplace B2B -->
-    <section id="view-buyer" class="app-view">
-        <h2>Mercado Industrial B2B</h2>
-        <div class="dashboard-container">
-            <!-- Columna Izquierda: Filtros Avanzados -->
-            <aside class="column-left">
-                <h3>Filtros Avanzados</h3>
-                <label>Distancia máxima (km):</label>
-                <input type="range" min="10" max="500" value="50" style="width:100%"><br><br>
-                
-                <label>Tipo de Productor:</label>
-                <select style="width:100%"><option>Cooperativa</option><option>Independiente</option></select><br><br>
-                
-                <label><input type="checkbox"> Certificación Ecológica</label><br>
-                <label><input type="checkbox"> Entrega Inmediata</label><br><br>
-                
-                <label>Volumen mínimo (kg):</label>
-                <input type="number" placeholder="Ej. 5" style="width:100%">
-            </aside>
-
-            <!-- Columna Central: Grid de Productos -->
-            <main class="column-center">
-                <div id="products-grid" style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <!-- Tarjeta de Producto B2B -->
-                    <div class="product-card" style="border: 1px solid #ccc; padding: 10px; width: 45%;">
-                        <img src="https://via.placeholder.com/200x120" alt="Lote Manzanas" style="width:100%">
-                        <h3>Manzanas Golden - Lote A</h3>
-                        <p><strong>Productor:</strong> Cooperativa El Sol</p>
-                        <p><strong>Precio Volumen:</strong> $18,000 / Ton</p>
-                        <p style="color: green; font-weight: bold;">🌱 Huella CO2: Muy Baja (15km)</p>
-                        <button>Añadir a Cotización</button>
-                    </div>
-                    <div class="product-card" style="border: 1px solid #ccc; padding: 10px; width: 45%;">
-                        <img src="https://via.placeholder.com/200x120" alt="Lote Lechugas" style="width:100%">
-                        <h3>Lechuga Romana - Lote B</h3>
-                        <p><strong>Productor:</strong> Huerta Verde</p>
-                        <p><strong>Precio Volumen:</strong> $12,000 / Ton</p>
-                        <p style="color: green; font-weight: bold;">🌱 Huella CO2: Baja (30km)</p>
-                        <button>Añadir a Cotización</button>
-                    </div>
-                </div>
-            </main>
-
-            <!-- Columna Derecha: Cotizador / Carrito -->
-            <aside class="column-right">
-                <h3>Cotizador Industrial</h3>
-                <p>No hay lotes en tu cotización actual.</p>
-                <hr>
-                <p><strong>Subtotal:</strong> $0.00</p>
-                <p><strong>Ahorro CO2 Proyectado:</strong> 0 kg</p>
-                <button style="width:100%; background:#28a745; color:white; padding:10px; border:none;">Generar Orden de Compra</button>
-            </aside>
-        </div>
-    </section>
-
-    <hr>
-
-    <!-- 2. Tablero Verde (Green Dashboard) -->
-    <section id="green-dashboard" class="app-view">
-        <h2>Tablero Verde de Sostenibilidad</h2>
-        <div class="kpi-container">
-            <div class="kpi-card">
-                <p>Total CO2 Mitigado</p>
-                <h3>2,450 kg</h3>
-                <small>Equivale a plantar 115 árboles</small>
-            </div>
-            <div class="kpi-card">
-                <p>Mermas Rescatadas</p>
-                <h3>18%</h3>
-                <small>Integradas a economía circular</small>
-            </div>
-            <div class="kpi-card">
-                <p>Compras Locales</p>
-                <h3>65%</h3>
-                <small>Del abastecimiento total</small>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Conecta Local - Roceel</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="login.html">Iniciar Sesión</a></li>
+                    <li class="nav-item"><a class="nav-link" href="signup.html">Registrarse</a></li>
+                    <li class="nav-item"><a class="nav-link" href="private/user.html">Mi Cuenta</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Salir</a></li>
+                </ul>
             </div>
         </div>
-        
-        <!-- Canvas para la gráfica de Chart.js -->
-        <div style="width: 100%; max-width: 800px; margin: 0 auto;">
-            <canvas id="co2Chart"></canvas>
-        </div>
-        
-        <div style="text-align: right; margin-top: 15px;">
-            <button style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px;">Descargar Reporte Sostenibilidad (PDF)</button>
-        </div>
-    </section>
+    </nav>
 
-    <hr>
+    <div class="container mb-5">
+        <div class="text-center mb-4">
+            <div class="role-switcher shadow-sm">
+                <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="window.location.href='index.html'">Comprador</button>
+                <button class="btn btn-sm btn-outline-dark border-0 rounded-pill px-3" onclick="window.location.href='../private/producer.html'">Productor</button>
+                <button class="btn btn-sm btn-outline-dark border-0 rounded-pill px-3" onclick="window.location.href='../private/collaborative-logistics.html'">Logística</button>
+            </div>
+        </div>
 
-    <!-- 3. Escáner de Historial -->
-    <section id="history-scanner" class="app-view" style="margin-bottom: 50px;">
-        <h2>Verificación de Origen (Trazabilidad)</h2>
-        <div style="display: flex; gap: 20px;">
-            <div style="flex: 1;">
-                <input type="text" id="lote-id" placeholder="Ingresa ID del Lote o Escanea QR" style="width: 70%; padding: 10px;">
-                <button onclick="scanHistory()" style="padding: 10px;">Buscar / Escanear</button>
-                
-                <div id="timeline-results" class="timeline" style="display: none;">
-                    <div class="timeline-node">
-                        <strong>Nodo Origen:</strong> Parcela "El Sol", Cosechado el 12/Oct/2023 por Cooperativa El Sol.
+        <!-- 1. Marketplace B2B -->
+        <section id="view-buyer" class="mb-5">
+            <h2 class="fw-bold mb-4">Mercado Industrial B2B</h2>
+            <div class="row g-4">
+                <!-- Columna Izquierda: Filtros -->
+                <aside class="col-lg-3">
+                    <div class="sidebar-filters shadow-sm">
+                        <h5 class="fw-bold mb-3">Filtros Avanzados</h5>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Distancia máxima (km)</label>
+                            <input type="range" class="form-range" min="10" max="500" value="50">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Tipo de Productor</label>
+                            <select class="form-select form-select-sm">
+                                <option>Cooperativa</option>
+                                <option>Independiente</option>
+                            </select>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="ecoCert">
+                            <label class="form-check-label small" for="ecoCert">Certificación Ecológica</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="fastDel">
+                            <label class="form-check-label small" for="fastDel">Entrega Inmediata</label>
+                        </div>
+                        <button class="btn btn-primary w-100 btn-sm rounded-pill">Aplicar Filtros</button>
                     </div>
-                    <div class="timeline-node">
-                        <strong>Nodo Tránsito:</strong> Transportes Rápidos SA. Traslado de 45 mins. Temperatura mantenida: 4°C.
+                </aside>
+
+                <!-- Columna Central: Grid -->
+                <main class="col-lg-6">
+                    <div class="row g-3" id="products-grid">
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=400" class="card-img-top" alt="Manzanas" style="height: 150px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">Manzanas Golden</h5>
+                                    <p class="card-text text-muted small mb-1">Cooperativa El Sol</p>
+                                    <p class="fw-bold text-primary mb-2">$18,000 / Ton</p>
+                                    <div class="badge bg-light text-success mb-3">🌱 CO2: Muy Baja (15km)</div>
+                                    <button class="btn btn-outline-primary btn-sm w-100 rounded-pill">Añadir a Cotización</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1622206141540-584504478241?auto=format&fit=crop&w=400" class="card-img-top" alt="Lechugas" style="height: 150px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">Lechuga Romana</h5>
+                                    <p class="card-text text-muted small mb-1">Huerta Verde</p>
+                                    <p class="fw-bold text-primary mb-2">$12,000 / Ton</p>
+                                    <div class="badge bg-light text-success mb-3">🌱 CO2: Baja (30km)</div>
+                                    <button class="btn btn-outline-primary btn-sm w-100 rounded-pill">Añadir a Cotización</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="timeline-node">
-                        <strong>Nodo Destino:</strong> Recepción confirmada en Almacén Norte el 13/Oct/2023.
+                </main>
+
+                <!-- Columna Derecha: Cotizador -->
+                <aside class="col-lg-3">
+                    <div class="card shadow-sm p-3">
+                        <h5 class="fw-bold mb-3">Cotizador Industrial</h5>
+                        <div class="text-center py-4 text-muted small">
+                            <p>No hay lotes seleccionados</p>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span class="fw-bold">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4 text-success small">
+                            <span>Ahorro CO2:</span>
+                            <span class="fw-bold">0 kg</span>
+                        </div>
+                        <button class="btn btn-success w-100 rounded-pill fw-bold">Generar Orden</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- 2. Tablero Verde -->
+        <section id="green-dashboard" class="mb-5 py-5 bg-white rounded-4 shadow-sm px-4">
+            <h2 class="fw-bold mb-4 text-center">Tablero de Sostenibilidad</h2>
+            <div class="row g-4 mb-5">
+                <div class="col-md-4"><div class="kpi-card"><h6>CO2 Mitigado</h6><h3 class="fw-bold text-success">2,450 kg</h3><small class="text-muted">115 árboles plantados</small></div></div>
+                <div class="col-md-4"><div class="kpi-card"><h6>Mermas Rescatadas</h6><h3 class="fw-bold text-success">18%</h3><small class="text-muted">Economía circular</small></div></div>
+                <div class="col-md-4"><div class="kpi-card"><h6>Compras Locales</h6><h3 class="fw-bold text-success">65%</h3><small class="text-muted">Abastecimiento regional</small></div></div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <canvas id="co2Chart" height="100"></canvas>
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-primary rounded-pill">Descargar Reporte PDF</button>
                     </div>
                 </div>
             </div>
-            
-            <!-- Mock visual del Mapa -->
-            <div style="flex: 1; background: #e0e0e0; display: flex; align-items: center; justify-content: center; height: 250px; border-radius: 8px;">
-                [Mapa Interactivo de Trazabilidad: Ruta de la Parcela al Almacén]
-            </div>
-        </div>
-    </section>
+        </section>
+
+    </div>
 
     <script src="../JS/index.js"></script>
     <script src="main.js"></script>
