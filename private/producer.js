@@ -1,14 +1,58 @@
-const user = JSON.parse(sessionStorage.getItem("user"));
+const userStr = sessionStorage.getItem("user");
+if (!userStr) {
+    alert("Debes iniciar sesión para poder publicar un lote.");
+    window.location.href = "../public/login.html";
+}
+const user = JSON.parse(userStr);
 
-console.log(user.usuario);
+if (user) console.log("Usuario actual:", user.usuario);
 
 
+// 0. Manejo de subida de imagen (Convertir a Data URL para la base de datos)
+let uploadedImageUrl = "sin_imagen";
 
+async function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const btnFoto = document.getElementById('btn-foto');
+        if(btnFoto) {
+            btnFoto.innerHTML = "Subiendo a la nube...";
+            btnFoto.disabled = true;
+        }
 
+        const formData = new FormData();
+        formData.append("image", file);
 
-
-
-
+        try {
+            // Nota: Para producción, crea una API key gratis en api.imgbb.com
+            const API_KEY = "a778269952031145c642a14d4008741c"; // Key pública de prueba (mejor obtener una propia)
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
+                method: "POST",
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Reemplazamos el link falso por el link real devuelto por la nube
+                uploadedImageUrl = result.data.url; 
+                
+                btnFoto.innerHTML = "✅ Foto Guardada";
+                btnFoto.classList.remove('btn-outline-secondary');
+                btnFoto.classList.add('btn-success', 'text-white');
+            } else {
+                alert("Error al subir la imagen. Intenta de nuevo.");
+                btnFoto.innerHTML = "📷 Reintentar Foto";
+            }
+        } catch (error) {
+            console.error("Error subiendo foto:", error);
+            alert("No se pudo conectar al servidor de imágenes.");
+            btnFoto.innerHTML = "📷 Reintentar Foto";
+        } finally {
+            if(btnFoto) btnFoto.disabled = false;
+        }
+    }
+}
 
 // Archivo privado: Lógica de Productor
 // 1. Navegación del Wizard
@@ -94,8 +138,19 @@ function captureGPS() {
 async function handleFormSubmit(event) {
     event.preventDefault();
 
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    const idUsuarios = user.usuario;
+    // 1. Cambiamos el texto del botón para dar feedback de carga
+    const btnSubmit = document.getElementById('btn-submit');
+    const originalText = btnSubmit.innerHTML;
+    btnSubmit.innerHTML = "⏳ Guardando...";
+    btnSubmit.disabled = true;
+
+    const sessionUser = JSON.parse(sessionStorage.getItem("user"));
+    if (!sessionUser) {
+        alert("Sesión expirada. Por favor inicia sesión nuevamente.");
+        window.location.href = "../public/login.html";
+        return;
+    }
+    const idUsuarios = sessionUser.usuario;
 
     const idCategoria = getCategoriaId(document.getElementById('category').value);
     const idTipoPublicacion = document.getElementById('transaction-type').value === 'venta' ? 1 : 2;
@@ -104,7 +159,7 @@ async function handleFormSubmit(event) {
     const cantidad = document.getElementById('quantity').value;
     const precio = idTipoPublicacion === 1 ? document.getElementById('price').value : null;
     const unidadMedida = document.getElementById('unit').value;
-    const urlImagen = "sin_imagen"; // placeholder por ahora
+    const urlImagen = uploadedImageUrl; // Se enviará la URL Base64 a tu API
 
     const API_URL = "https://calamity-hypertext-strenuous.ngrok-free.dev";
 
@@ -121,13 +176,25 @@ async function handleFormSubmit(event) {
         const data = await res.json();
 
         if (data.ok) {
-            alert("Producto registrado correctamente");
+            // 2. Mostrar el modal de QR en lugar de solo un alert
+            document.getElementById('qr-product-name-display').innerText = nombre;
+            const randomId = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('lote-id-text').innerText = `LOTE-MX-${randomId}`;
+            
+            // Generar QR visual usando una API pública basada en los datos
+            document.getElementById('qr-code-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ConectaLocal-LOTE-MX-${randomId}`;
+            
+            document.getElementById('qr-modal').style.display = 'block';
         } else {
             alert(data.message);
         }
     } catch (err) {
         console.error(err);
         alert("Error al conectar con el servidor");
+    } finally {
+        // 3. Restaurar el botón al terminar (ya sea éxito o error)
+        btnSubmit.innerHTML = originalText;
+        btnSubmit.disabled = false;
     }
 }
 

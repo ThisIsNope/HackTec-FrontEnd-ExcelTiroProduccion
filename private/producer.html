@@ -25,10 +25,10 @@
                             <div id="step-1" class="wizard-step active">
                                 <h5 class="fw-bold text-muted border-bottom pb-2 mb-4">Paso 1: ¿Qué vas a registrar?</h5>
                                 
-                                <button type="button" class="btn btn-outline-secondary w-100 rounded-3 py-3 mb-4 fw-bold shadow-sm" onclick="document.getElementById('product-image').click()">
+                                <button type="button" id="btn-foto" class="btn btn-outline-secondary w-100 rounded-3 py-3 mb-4 fw-bold shadow-sm" onclick="document.getElementById('product-image').click()">
                                     📷 Capturar Foto del Lote
                                 </button>
-                                <input type="file" id="product-image" accept="image/*" capture="environment" style="display:none;">
+                                <input type="file" id="product-image" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event)">
                                 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold text-muted small">Categoría / Tipo:</label>
