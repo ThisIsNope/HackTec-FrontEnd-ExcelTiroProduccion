@@ -1,6 +1,41 @@
+const user = JSON.parse(sessionStorage.getItem("user"));
+
+console.log(user.usuario);
+
+
+
+
+
+
+
+
+
 // Archivo privado: Lógica de Productor
 // 1. Navegación del Wizard
 function goToStep(stepNumber) {
+    if (stepNumber === 2) {
+        const nombre = document.getElementById('product-name').value;
+        const descripcion = document.getElementById('product-description').value;
+        if (!nombre || !descripcion) {
+            alert("Por favor llena todos los campos antes de continuar");
+            return;
+        }
+    }
+
+    if (stepNumber === 3) {
+        const cantidad = document.getElementById('quantity').value;
+        const transactionType = document.getElementById('transaction-type').value;
+        const precio = document.getElementById('price').value;
+        if (!cantidad) {
+            alert("Por favor llena la cantidad");
+            return;
+        }
+        if (transactionType === 'venta' && !precio) {
+            alert("Por favor ingresa el precio");
+            return;
+        }
+    }
+
     document.querySelectorAll('.wizard-step').forEach(step => {
         step.classList.remove('active');
     });
@@ -56,47 +91,55 @@ function captureGPS() {
 }
 
 // 2. Envío del Formulario y Lógica Offline
-function handleFormSubmit(event) {
+async function handleFormSubmit(event) {
     event.preventDefault();
-    const btnSubmit = document.getElementById('btn-submit');
-    const name = document.getElementById('product-name').value;
-    
-    // Generar un ID único de Lote
-    const loteID = "LOTE-MX-2026-" + Math.floor(Math.random() * 90000 + 10000);
-    
-    // LÓGICA OFFLINE CRUCIAL
-    if (!navigator.onLine) {
-        alert("⚠️ Estás sin conexión a internet. El lote se guardó en la memoria local de tu teléfono.");
-        btnSubmit.innerText = "Guardado (En espera de red)";
-        btnSubmit.style.backgroundColor = "#ffc107";
-        btnSubmit.style.color = "black";
-        
-        // Guardado local (Simulación)
-        localStorage.setItem('pending_lote', loteID);
-        return;
+
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    const idUsuarios = user.usuario;
+
+    const idCategoria = getCategoriaId(document.getElementById('category').value);
+    const idTipoPublicacion = document.getElementById('transaction-type').value === 'venta' ? 1 : 2;
+    const nombre = document.getElementById('product-name').value;
+    const descripcion = document.getElementById('product-description').value;
+    const cantidad = document.getElementById('quantity').value;
+    const precio = idTipoPublicacion === 1 ? document.getElementById('price').value : null;
+    const unidadMedida = document.getElementById('unit').value;
+    const urlImagen = "sin_imagen"; // placeholder por ahora
+
+    const API_URL = "https://calamity-hypertext-strenuous.ngrok-free.dev";
+
+    try {
+        const res = await fetch(`${API_URL}/producto`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true"
+            },
+            body: JSON.stringify([idCategoria, idTipoPublicacion, idUsuarios, nombre, descripcion, cantidad, precio, unidadMedida, urlImagen])
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+            alert("Producto registrado correctamente");
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error al conectar con el servidor");
     }
+}
 
-    // --- COMUNICACIÓN CON EL MARKETPLACE (SIMULACIÓN DE BASE DE DATOS) ---
-    const loteData = {
-        id: loteID,
-        name: name,
-        date: new Date().toLocaleDateString(),
-        coords: currentCoords ? `${currentCoords.latitude.toFixed(4)}, ${currentCoords.longitude.toFixed(4)}` : "No registradas"
+function getCategoriaId(categoria) {
+    const categorias = {
+        "frutas": 1,
+        "verduras": 2,
+        "madera": 3,
+        "textil": 4,
+        "carton": 5
     };
-    let db = JSON.parse(localStorage.getItem('roceel_db') || '[]');
-    db.push(loteData);
-    localStorage.setItem('roceel_db', JSON.stringify(db));
-
-    // Si hay conexión: Generar URL Firmada para el QR
-    const urlFirmada = `https://conectalocal.id/lote/${loteID}`;
-    
-    // Renderizar QR
-    document.getElementById('qr-product-name-display').innerHTML = `<strong>Producto:</strong> ${name}`;
-    document.getElementById('lote-id-text').innerText = loteID;
-    document.getElementById('qr-code-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(urlFirmada)}`;
-    
-    // Mostrar Modal a pantalla completa
-    document.getElementById('qr-modal').style.display = 'block';
+    return categorias[categoria] || 1;
 }
 
 // 3. Lógica de la Billetera Verde
