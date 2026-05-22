@@ -48,16 +48,6 @@
     <button type="submit" form="signup-form">Registrarse</button>
     <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
 
-    <script>
-        function toggleCompanyFields() {
-            const userType = document.getElementById('user-type').value;
-            const companyForm = document.getElementById('info-para-empresa');
-            if (userType === 'empresa') {
-                companyForm.style.display = 'block';
-            } else {
-                companyForm.style.display = 'none';
-            }
-        }
-    </script>
+    <script src="../JS/register.js"></script>
 </body>
 </html>
