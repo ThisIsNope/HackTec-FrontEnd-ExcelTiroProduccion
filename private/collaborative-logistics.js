@@ -11,7 +11,7 @@ const user = JSON.parse(userStr);
 let mapRuta = null;
 let intercambios = [];
 let viajes = [];
-const CAPACIDAD_MAX = 3.5;
+const CAPACIDAD_MAX = 30;
 
 document.addEventListener("DOMContentLoaded", async () => {
     cargarLeaflet(() => {
@@ -172,35 +172,56 @@ function renderViajes(viajes) {
         <button id="btn-generar" class="btn btn-outline-primary w-100 rounded-pill fw-bold mb-3" onclick="generarViajes()">
             🚛 Reagrupar Pendientes
         </button>
-        ${viajes.map((v, vi) => `
+        ${viajes.map((v, vi) => {
+            // Calcular peso del viaje con conversión
+            const pesoTon = v.intercambios.reduce((acc, i) => {
+                const peso = parseFloat(i.peso) || 0;
+                const unidad = (i.unidadMedida || '').toLowerCase();
+                return acc + (unidad === 'kg' ? peso / 1000 : peso);
+            }, 0);
+
+            const estadoColor = v.estado === 'en_camino' ? 'success' :
+                               v.estado === 'cancelado' ? 'danger' : 'warning';
+            const estadoLabel = v.estado === 'en_camino' ? '🚛 En Camino' :
+                               v.estado === 'cancelado' ? '❌ Cancelado' : '⏳ Pendiente';
+
+            return `
             <div class="card border rounded-3 mb-3 bg-light">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="badge bg-${colores[vi % colores.length]}">Viaje #${v.idViaje}</span>
-                        <span class="small fw-bold text-muted">${v.pesoTotal.toFixed(2)} ton | ${v.estado}</span>
+                        <span class="badge bg-${estadoColor}">${estadoLabel}</span>
                     </div>
-                    ${v.intercambios.map(i => `
+                    <p class="small text-muted mb-2">⚖️ ${pesoTon.toFixed(3)} ton | 📅 ${v.fechaViaje}</p>
+                    ${v.intercambios.map(i => {
+                        const pesoI = parseFloat(i.peso) || 0;
+                        const unidadI = (i.unidadMedida || '').toLowerCase();
+                        const pesoDisplay = unidadI === 'kg' 
+                            ? `${pesoI} kg (${(pesoI/1000).toFixed(3)} ton)`
+                            : `${pesoI} ton`;
+                        return `
                         <div class="border-bottom pb-2 mb-2">
                             <h6 class="fw-bold mb-0 small">${i.producto}</h6>
-                            <p class="text-muted mb-1" style="font-size:0.75rem;">
+                            <p class="text-muted mb-0" style="font-size:0.75rem;">
                                 🏭 ${i.productor} → 🧑 ${i.comprador}<br>
-                                📦 ${i.cantidad} ${i.unidadMedida}
+                                📦 ${i.cantidad} ${i.unidadMedida} | ⚖️ ${pesoDisplay}
                             </p>
-                        </div>
-                    `).join("")}
+                        </div>`;
+                    }).join("")}
+                    ${v.estado === 'pendiente' ? `
                     <div class="d-flex gap-2 mt-2">
                         <button class="btn btn-success btn-sm rounded-pill fw-bold w-50"
                             onclick="actualizarEstadoViaje(${v.idViaje}, 'en_camino')">
-                            🚛 En Camino
+                            ✅ Aceptar y Enviar
                         </button>
                         <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold w-50"
                             onclick="actualizarEstadoViaje(${v.idViaje}, 'cancelado')">
-                            ✕ Cancelar
+                            ✕ Rechazar
                         </button>
-                    </div>
+                    </div>` : ''}
                 </div>
-            </div>
-        `).join("")}
+            </div>`;
+        }).join("")}
     `;
 }
 
@@ -241,12 +262,20 @@ function renderItinerario(viajes) {
 }
 
 function calcularCapacidad(intercambios) {
-    const pesoTotal = intercambios.reduce((acc, i) => acc + (parseFloat(i.peso) || 0), 0);
+    // Convertir todo a toneladas para el cálculo
+    const pesoTotal = intercambios.reduce((acc, i) => {
+        const peso = parseFloat(i.peso) || 0;
+        const unidad = (i.unidadMedida || '').toLowerCase();
+        // Si está en kg convertir a ton, si ya es ton dejarlo
+        const pesoTon = unidad === 'kg' ? peso / 1000 : peso;
+        return acc + pesoTon;
+    }, 0);
+
     const porcentaje = Math.min((pesoTotal / CAPACIDAD_MAX) * 100, 100).toFixed(0);
     document.getElementById("peso-actual").innerText = pesoTotal.toFixed(2);
     document.getElementById("porcentaje-capacidad").innerText = `${porcentaje}% Lleno`;
     document.getElementById("barra-capacidad").style.width = `${porcentaje}%`;
-    document.getElementById("barra-capacidad").className = `progress-bar ${porcentaje > 80 ? 'bg-danger' : 'bg-warning'}`;
+    document.getElementById("barra-capacidad").className = `progress-bar ${porcentaje > 80 ? 'bg-danger' : porcentaje > 50 ? 'bg-warning' : 'bg-success'}`;
 }
 
 async function actualizarEstadoViaje(idViaje, estado) {
