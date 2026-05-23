@@ -28,14 +28,16 @@ async function setDestino(lat, lng) {
     destinoLat = lat;
     destinoLng = lng;
 
-    // Mover marcador
     if (markerDestino) markerDestino.remove();
     markerDestino = L.marker([lat, lng]).addTo(mapDestino);
 
-    // Reverse geocoding para mostrar dirección legible
+    // Reverse geocoding
     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
     const data = await res.json();
     document.getElementById("destino-texto").innerText = `📍 ${data.display_name}`;
+
+    // Calcular distancia a cada producto y actualizar cards
+    actualizarDistancias(lat, lng);
 }
 
 let searchTimeout = null;
@@ -123,15 +125,21 @@ function renderProductos(productos) {
         const precio = p.precio ? `$${p.precio.toLocaleString()} / ${p.unidadMedida}` : "Trueque";
         const col = document.createElement("div");
         col.className = "col-md-6";
+        col.dataset.lat = p.lat || "";
+        col.dataset.lng = p.lng || "";
         col.innerHTML = `
             <div class="card h-100 shadow-sm">
-                <img src="${p.urlImagen}" class="card-img-top" alt="${p.nombre}" style="height: 150px; object-fit: cover;"
+                <img src="${p.urlImagen}" class="card-img-top" alt="${p.nombre}" 
+                     style="height: 150px; object-fit: cover;"
                      onerror="this.src='https://via.placeholder.com/400x150?text=Sin+imagen'">
                 <div class="card-body">
                     <h5 class="card-title fw-bold">${p.nombre}</h5>
                     <p class="card-text text-muted small mb-1">${p.productor}</p>
                     <p class="fw-bold text-primary mb-2">${precio}</p>
-                    <div class="badge bg-light text-success mb-3">🏷️ ${p.categoria}</div>
+                    <div class="badge bg-light text-success mb-1">🏷️ ${p.categoria}</div>
+                    <div class="badge bg-light text-primary mb-3 dist-badge">
+                        ${destinoLat ? `📦 ${haversineKm(p.lat, p.lng, destinoLat, destinoLng).toFixed(1)} km` : "📦 Selecciona destino para ver distancia"}
+                    </div>
                     <button class="btn btn-outline-primary btn-sm w-100 rounded-pill"
                         onclick="agregarCotizacion(${p.idProducto}, '${p.nombre}', ${p.precio || 0})">
                         Añadir a Cotización
@@ -151,6 +159,16 @@ function agregarCotizacion(idProducto, nombre, precio) {
     }
     cotizacion.push({ idProducto, nombre, precio });
     actualizarCotizador();
+}
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function quitarCotizacion(idProducto) {
@@ -192,6 +210,23 @@ async function aplicarFiltros() {
     } catch (err) {
         console.error(err);
     }
+}
+
+function actualizarDistancias(destLat, destLng) {
+    // Obtener productos actuales del grid
+    const cards = document.querySelectorAll("#products-grid .col-md-6");
+    cards.forEach(card => {
+        const distBadge = card.querySelector(".dist-badge");
+        const prodLat = card.dataset.lat;
+        const prodLng = card.dataset.lng;
+
+        if (prodLat && prodLng && distBadge) {
+            const km = haversineKm(parseFloat(prodLat), parseFloat(prodLng), destLat, destLng);
+            distBadge.innerText = `📦 ${km.toFixed(1)} km de distancia`;
+        } else if (distBadge) {
+            distBadge.innerText = "📦 Distancia no disponible";
+        }
+    });
 }
 
 function logout() {
