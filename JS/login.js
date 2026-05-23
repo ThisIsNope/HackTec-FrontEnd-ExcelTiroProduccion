@@ -16,7 +16,7 @@ async function handleLogin(event) {
     const data = await test.json();
     if (data.ok) {
         sessionStorage.setItem("user", JSON.stringify(data.user));
-        window.location.href = "/public/index.html";
+        window.location.href = "../index.html";
     } else {
         alert("Usuario y/o Contraseña Incorrectos");
     }
