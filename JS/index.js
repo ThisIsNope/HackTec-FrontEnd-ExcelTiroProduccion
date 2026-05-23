@@ -122,7 +122,7 @@ function renderProductos(productos) {
     const grid = document.getElementById("products-grid");
     grid.innerHTML = "";
     productos.forEach(p => {
-        const precio = p.precio ? `$${p.precio.toLocaleString()} / ${p.unidadMedida}` : "Trueque";
+        const precio = p.idTipoPublicacion === 2 ? `🔄 Trueque / ${p.unidadMedida}` : `$${p.precio.toLocaleString()} / ${p.unidadMedida}`;
         const col = document.createElement("div");
         col.className = "col-md-6";
         col.dataset.lat = p.lat || "";
