@@ -118,11 +118,16 @@ async function cargarProductos() {
     }
 }
 
+function calcularCO2(distanciaKm, pesoTon) {
+    // Factor estándar: 0.062 kg CO2 por ton/km en camión
+    return (distanciaKm * pesoTon * 0.062).toFixed(2);
+}
+
 function renderProductos(productos) {
     const grid = document.getElementById("products-grid");
     grid.innerHTML = "";
     productos.forEach(p => {
-        const precio = p.precio ? `$${p.precio.toLocaleString()} / ${p.unidadMedida}` : "Trueque";
+        const precio = p.idTipoPublicacion === 2 ? `🔄 Trueque / ${p.unidadMedida}` : `$${p.precio.toLocaleString()} / ${p.unidadMedida}`;
         const col = document.createElement("div");
         col.className = "col-md-6";
         col.dataset.lat = p.lat || "";
@@ -141,7 +146,7 @@ function renderProductos(productos) {
                         ${destinoLat ? `📦 ${haversineKm(p.lat, p.lng, destinoLat, destinoLng).toFixed(1)} km` : "📦 Selecciona destino para ver distancia"}
                     </div>
                     <button class="btn btn-outline-primary btn-sm w-100 rounded-pill"
-                        onclick="agregarCotizacion(${p.idProducto}, '${p.nombre}', ${p.precio || 0})">
+                        onclick="agregarCotizacion(${p.idProducto}, '${p.nombre}', ${p.precio || 0}, ${p.lat || null}, ${p.lng || null}, ${p.peso || 0})">
                         Añadir a Cotización
                     </button>
                 </div>
@@ -151,13 +156,13 @@ function renderProductos(productos) {
     });
 }
 
-function agregarCotizacion(idProducto, nombre, precio) {
+function agregarCotizacion(idProducto, nombre, precio, lat, lng, peso) {
     const existe = cotizacion.find(p => p.idProducto === idProducto);
     if (existe) {
         alert("Este producto ya está en tu cotización");
         return;
     }
-    cotizacion.push({ idProducto, nombre, precio });
+    cotizacion.push({ idProducto, nombre, precio, lat, lng, peso });
     actualizarCotizador();
 }
 
@@ -179,6 +184,7 @@ function quitarCotizacion(idProducto) {
 function actualizarCotizador() {
     const contenedor = document.getElementById("cotizacion-lista");
     const subtotalEl = document.getElementById("subtotal");
+    const co2El = document.querySelector(".d-flex.justify-content-between.mb-4 .fw-bold");
 
     if (cotizacion.length === 0) {
         contenedor.innerHTML = `<p class="text-muted small">No hay lotes seleccionados</p>`;
@@ -197,6 +203,18 @@ function actualizarCotizador() {
 
     const subtotal = cotizacion.reduce((acc, p) => acc + (p.precio || 0), 0);
     subtotalEl.innerText = `$${subtotal.toLocaleString()}`;
+
+    // Calcular CO2 total si hay destino
+    if (destinoLat && destinoLng) {
+        const totalCO2 = cotizacion.reduce((acc, p) => {
+            if (p.lat && p.lng && p.peso) {
+                const km = haversineKm(parseFloat(p.lat), parseFloat(p.lng), destinoLat, destinoLng);
+                return acc + parseFloat(calcularCO2(km, p.peso));
+            }
+            return acc;
+        }, 0);
+        if (co2El) co2El.innerText = `${totalCO2.toFixed(2)} kg`;
+    }
 }
 
 async function aplicarFiltros() {
