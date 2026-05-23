@@ -58,11 +58,11 @@ async function handleImageUpload(event) {
 // 1. Navegación del Wizard
 function goToStep(stepNumber) {
     if (stepNumber === 2) {
-        const descripcion = document.getElementById('product-description').value;
-        if (!descripcion) {
-            alert("Por favor llena la descripción antes de continuar");
-            return;
-        }
+    const nombre = document.getElementById('product-name').value;
+    const descripcion = document.getElementById('product-description').value;
+    if (!nombre || !descripcion) {
+        alert("Por favor llena todos los campos antes de continuar");
+        return;
     }
 
     if (stepNumber === 3) {
