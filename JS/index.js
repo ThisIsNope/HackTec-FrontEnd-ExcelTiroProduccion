@@ -1,11 +1,108 @@
 const API_URL = "https://calamity-hypertext-strenuous.ngrok-free.dev";
 const user = JSON.parse(sessionStorage.getItem("user"));
-let cotizacion = []; // productos en el cotizador
+let cotizacion = [];
+let mapDestino = null;
+let markerDestino = null;
+let destinoLat = null;
+let destinoLng = null;
 
-// Cargar productos al iniciar
 document.addEventListener("DOMContentLoaded", async () => {
     await cargarProductos();
+    iniciarMapa();
 });
+
+function iniciarMapa() {
+    mapDestino = L.map('map-destino').setView([25.6866, -100.3161], 12); // Monterrey por default
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(mapDestino);
+
+    // Click en el mapa para seleccionar destino
+    mapDestino.on('click', async (e) => {
+        const { lat, lng } = e.latlng;
+        await setDestino(lat, lng);
+    });
+}
+
+async function setDestino(lat, lng) {
+    destinoLat = lat;
+    destinoLng = lng;
+
+    // Mover marcador
+    if (markerDestino) markerDestino.remove();
+    markerDestino = L.marker([lat, lng]).addTo(mapDestino);
+
+    // Reverse geocoding para mostrar dirección legible
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+    const data = await res.json();
+    document.getElementById("destino-texto").innerText = `📍 ${data.display_name}`;
+}
+
+let searchTimeout = null;
+async function buscarDireccion() {
+    const query = document.getElementById("search-destino").value;
+    if (query.length < 3) return;
+
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`);
+        const resultados = await res.json();
+
+        const lista = document.getElementById("search-results");
+        lista.innerHTML = resultados.map(r => `
+            <button class="list-group-item list-group-item-action small py-1"
+                onclick="seleccionarResultado(${r.lat}, ${r.lon}, '${r.display_name.replace(/'/g, "")}')">
+                ${r.display_name}
+            </button>
+        `).join("");
+    }, 400);
+}
+
+async function seleccionarResultado(lat, lng, nombre) {
+    document.getElementById("search-results").innerHTML = "";
+    document.getElementById("search-destino").value = nombre;
+    mapDestino.setView([lat, lng], 15);
+    await setDestino(lat, lng);
+}
+
+async function generarOrden() {
+    if (cotizacion.length === 0) {
+        alert("No hay productos en la cotización");
+        return;
+    }
+    if (!user) {
+        alert("Debes iniciar sesión para generar una orden");
+        return;
+    }
+    if (!destinoLat || !destinoLng) {
+        alert("Por favor selecciona tu dirección de entrega en el mapa");
+        return;
+    }
+
+    try {
+        for (const p of cotizacion) {
+            await fetch(`${API_URL}/intercambio`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true"
+                },
+                body: JSON.stringify([p.idProducto, user.usuario, destinoLat, destinoLng])
+            });
+        }
+        alert("¡Orden generada correctamente!");
+        cotizacion = [];
+        destinoLat = null;
+        destinoLng = null;
+        if (markerDestino) markerDestino.remove();
+        document.getElementById("destino-texto").innerText = "";
+        document.getElementById("search-destino").value = "";
+        actualizarCotizador();
+    } catch (err) {
+        console.error(err);
+        alert("Error al generar la orden");
+    }
+}
 
 async function cargarProductos() {
     try {
@@ -13,9 +110,7 @@ async function cargarProductos() {
             headers: { "ngrok-skip-browser-warning": "true" }
         });
         const data = await res.json();
-        if (data.ok) {
-            renderProductos(data.productos);
-        }
+        if (data.ok) renderProductos(data.productos);
     } catch (err) {
         console.error(err);
     }
@@ -24,7 +119,6 @@ async function cargarProductos() {
 function renderProductos(productos) {
     const grid = document.getElementById("products-grid");
     grid.innerHTML = "";
-
     productos.forEach(p => {
         const precio = p.precio ? `$${p.precio.toLocaleString()} / ${p.unidadMedida}` : "Trueque";
         const col = document.createElement("div");
@@ -50,14 +144,17 @@ function renderProductos(productos) {
 }
 
 function agregarCotizacion(idProducto, nombre, precio) {
-    // Evitar duplicados
     const existe = cotizacion.find(p => p.idProducto === idProducto);
     if (existe) {
         alert("Este producto ya está en tu cotización");
         return;
     }
-
     cotizacion.push({ idProducto, nombre, precio });
+    actualizarCotizador();
+}
+
+function quitarCotizacion(idProducto) {
+    cotizacion = cotizacion.filter(p => p.idProducto !== idProducto);
     actualizarCotizador();
 }
 
@@ -84,41 +181,6 @@ function actualizarCotizador() {
     subtotalEl.innerText = `$${subtotal.toLocaleString()}`;
 }
 
-async function generarOrden() {
-    if (cotizacion.length === 0) {
-        alert("No hay productos en la cotización");
-        return;
-    }
-    if (!user) {
-        alert("Debes iniciar sesión para generar una orden");
-        return;
-    }
-
-    try {
-        for (const p of cotizacion) {
-            await fetch(`${API_URL}/intercambio`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "ngrok-skip-browser-warning": "true"
-                },
-                body: JSON.stringify([p.idProducto, user.usuario])
-            });
-        }
-        alert("¡Orden generada correctamente!");
-        cotizacion = [];
-        actualizarCotizador();
-    } catch (err) {
-        console.error(err);
-        alert("Error al generar la orden");
-    }
-}
-
-function logout() {
-    sessionStorage.clear();
-    window.location.href = "login.html";
-}
-
 async function aplicarFiltros() {
     const tipo = document.getElementById("filter-tipo-productor").value;
     try {
@@ -126,15 +188,13 @@ async function aplicarFiltros() {
             headers: { "ngrok-skip-browser-warning": "true" }
         });
         const data = await res.json();
-        if (data.ok) {
-            renderProductos(data.productos);
-        }
+        if (data.ok) renderProductos(data.productos);
     } catch (err) {
         console.error(err);
     }
 }
 
-function quitarCotizacion(idProducto) {
-    cotizacion = cotizacion.filter(p => p.idProducto !== idProducto);
-    actualizarCotizador();
+function logout() {
+    sessionStorage.clear();
+    window.location.href = "login.html";
 }
