@@ -186,6 +186,7 @@ async function handleFormSubmit(event) {
     const urlImagen = uploadedImageUrl;
     const latitud = currentCoords.latitude;
     const longitud = currentCoords.longitude;
+    const peso = document.getElementById('peso').value;
 
     const API_URL = "https://calamity-hypertext-strenuous.ngrok-free.dev";
 
@@ -197,7 +198,7 @@ async function handleFormSubmit(event) {
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true"
             },
-            body: JSON.stringify([idCategoria, idTipoPublicacion, idUsuarios, nombre, descripcion, cantidad, precio, unidadMedida, urlImagen, latitud, longitud])
+            body: JSON.stringify([idCategoria, idTipoPublicacion, idUsuarios, nombre, descripcion, cantidad, precio, unidadMedida, urlImagen, latitud, longitud, peso])
         });
 
         const data = await res.json(); // Se espera que el backend devuelva un objeto JSON
