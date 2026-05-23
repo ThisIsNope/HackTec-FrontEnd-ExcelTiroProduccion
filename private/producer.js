@@ -58,9 +58,9 @@ async function handleImageUpload(event) {
 // 1. Navegación del Wizard
 function goToStep(stepNumber) {
     if (stepNumber === 2) {
-        const nombre = document.getElementById('product-name').value;
         const descripcion = document.getElementById('product-description').value;
-        if (!nombre || !descripcion) {
+        const peso = document.getElementById('peso').value;
+        if (!descripcion || !peso) {
             alert("Por favor llena todos los campos antes de continuar");
             return;
         }
