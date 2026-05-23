@@ -59,9 +59,8 @@ async function handleImageUpload(event) {
 function goToStep(stepNumber) {
     if (stepNumber === 2) {
         const descripcion = document.getElementById('product-description').value;
-        const peso = document.getElementById('peso').value;
-        if (!descripcion || !peso) {
-            alert("Por favor llena todos los campos antes de continuar");
+        if (!descripcion) {
+            alert("Por favor llena la descripción antes de continuar");
             return;
         }
     }
@@ -229,7 +228,7 @@ async function handleFormSubmit(event) {
     const urlImagen = uploadedImageUrl;
     const latitud = currentCoords.latitude;
     const longitud = currentCoords.longitude;
-    const peso = document.getElementById('peso').value;
+    const peso = document.getElementById('quantity').value;
 
     const API_URL = "https://calamity-hypertext-strenuous.ngrok-free.dev";
 
