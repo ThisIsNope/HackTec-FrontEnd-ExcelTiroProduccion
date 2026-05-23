@@ -3,6 +3,7 @@ let userType;
 
 async function registrarUser(event) {
     event.preventDefault();
+    const userType = document.getElementById('user-type').value;
     const nombre = document.getElementById("nombre").value;
     const paterno = document.getElementById("last-name").value;
     const materno = document.getElementById("middle-name").value;

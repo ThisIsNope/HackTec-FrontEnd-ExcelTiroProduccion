@@ -35,7 +35,7 @@
                             </select>
                         </div>
 
-                        <form id="signup-form" onsubmit="handleSignup(event)">
+                        <form id="signup-form" onsubmit="registrarUser(event)">
                             <h5 class="fw-bold mb-3 text-muted border-bottom pb-2">Datos Personales</h5>
                             <div class="row">
                                 <div class="col-md-4">
@@ -168,17 +168,7 @@
         </div>
     </div>
 
-    <script>
-        function toggleCompanyFields() {
-            const userType = document.getElementById('user-type').value;
-            const companyForm = document.getElementById('info-para-empresa');
-            if (userType === 'empresa') {
-                companyForm.style.display = 'block';
-            } else {
-                companyForm.style.display = 'none';
-            }
-        }
-    </script>
+    <script src="../JS/register.js"></script>
 </body>
 
 </html>
