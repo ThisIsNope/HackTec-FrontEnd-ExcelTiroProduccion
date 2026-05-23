@@ -41,18 +41,34 @@ function iniciarMapa() {
 
 async function cargarViajes() {
     try {
-        const res = await fetch(`${API_URL}/viajes`, {
+        const res = await fetch(`${API_URL}/viajes?idUsuario=${user.usuario}`, {
             headers: { "ngrok-skip-browser-warning": "true" }
         });
         const data = await res.json();
         if (data.ok) {
             viajes = data.viajes;
-            // Juntar todos los intercambios para capacidad e itinerario
             intercambios = viajes.flatMap(v => v.intercambios);
             renderViajes(viajes);
             calcularCapacidad(intercambios);
             renderItinerario(viajes);
             renderMarcadores(viajes);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function cancelarIntercambio(idIntercambio, idViaje) {
+    if (!confirm("¿Cancelar este pedido del viaje?")) return;
+    try {
+        const res = await fetch(`${API_URL}/intercambio/${idIntercambio}`, {
+            method: "DELETE",
+            headers: { "ngrok-skip-browser-warning": "true" }
+        });
+        const data = await res.json();
+        if (data.ok) {
+            alert("Pedido cancelado");
+            await cargarViajes();
         }
     } catch (err) {
         console.error(err);
@@ -194,19 +210,28 @@ function renderViajes(viajes) {
                     </div>
                     <p class="small text-muted mb-2">⚖️ ${pesoTon.toFixed(3)} ton | 📅 ${v.fechaViaje}</p>
                     ${v.intercambios.map(i => {
-                        const pesoI = parseFloat(i.peso) || 0;
-                        const unidadI = (i.unidadMedida || '').toLowerCase();
-                        const pesoDisplay = unidadI === 'kg' 
-                            ? `${pesoI} kg (${(pesoI/1000).toFixed(3)} ton)`
-                            : `${pesoI} ton`;
-                        return `
-                        <div class="border-bottom pb-2 mb-2">
-                            <h6 class="fw-bold mb-0 small">${i.producto}</h6>
-                            <p class="text-muted mb-0" style="font-size:0.75rem;">
-                                🏭 ${i.productor} → 🧑 ${i.comprador}<br>
-                                📦 ${i.cantidad} ${i.unidadMedida} | ⚖️ ${pesoDisplay}
-                            </p>
-                        </div>`;
+                    const pesoI = parseFloat(i.peso) || 0;
+                    const unidadI = (i.unidadMedida || '').toLowerCase();
+                    const pesoDisplay = unidadI === 'kg'
+                        ? `${pesoI} kg (${(pesoI/1000).toFixed(3)} ton)`
+                        : `${pesoI} ton`;
+                    return `
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="fw-bold mb-0 small">${i.producto}</h6>
+                                <p class="text-muted mb-0" style="font-size:0.75rem;">
+                                    🏭 ${i.productor} → 🧑 ${i.comprador}<br>
+                                    📦 ${i.cantidad} ${i.unidadMedida} | ⚖️ ${pesoDisplay}
+                                </p>
+                            </div>
+                            ${v.estado === 'pendiente' ? `
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-2 py-0 ms-2"
+                                onclick="cancelarIntercambio(${i.idIntercambio}, ${v.idViaje})"
+                                title="Cancelar este pedido">✕</button>
+                            ` : ''}
+                        </div>
+                    </div>`;
                     }).join("")}
                     ${v.estado === 'pendiente' ? `
                     <div class="d-flex gap-2 mt-2">
