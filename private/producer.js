@@ -229,7 +229,7 @@ async function handleFormSubmit(event) {
     const urlImagen = uploadedImageUrl;
     const latitud = currentCoords.latitude;
     const longitud = currentCoords.longitude;
-    const peso = document.getElementById('quantity').value;
+    const peso = unidadMedida === 'kg' ? parseFloat(cantidad) / 1000 : parseFloat(cantidad);
 
     const API_URL = "https://calamity-hypertext-strenuous.ngrok-free.dev";
 
