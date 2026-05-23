@@ -115,6 +115,43 @@ let currentCoords = null;
 let mapOrigen = null;
 let markerOrigen = null;
 
+// Búsqueda manual de dirección por texto
+async function searchAddress() {
+    const query = document.getElementById('address-search').value;
+    const status = document.getElementById('gps-status');
+    const btnGps = document.getElementById('btn-gps');
+    
+    if (!query) {
+        alert("Por favor ingresa una dirección para buscar.");
+        return;
+    }
+
+    status.innerText = "⏳ Buscando dirección...";
+    btnGps.style.display = 'none';
+
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+            
+            currentCoords = { latitude: lat, longitude: lon };
+            status.innerText = "✅ Ubicación encontrada en el mapa.";
+            
+            mostrarMapaLeaflet(lat, lon);
+        } else {
+            status.innerText = "❌ No se encontró la dirección. Intenta de nuevo o usa el GPS.";
+            btnGps.style.display = 'block';
+        }
+    } catch (error) {
+        console.error("Error buscando dirección:", error);
+        status.innerText = "❌ Error de conexión al buscar la dirección.";
+        btnGps.style.display = 'block';
+    }
+}
+
 function captureGPS() {
     const btn = document.getElementById('btn-gps');
     const status = document.getElementById('gps-status');
@@ -128,18 +165,7 @@ function captureGPS() {
                 btn.style.display = 'none';
                 status.innerText = "✅ Ubicación precisa en el mapa.";
                 
-                // 1. Mostrar y configurar el mapa interactivo de Leaflet
-                const mapContainer = document.getElementById('map-origen');
-                mapContainer.style.display = 'block';
-                
-                if (!mapOrigen) {
-                    mapOrigen = L.map('map-origen', { scrollWheelZoom: false }).setView([lat, lon], 16); // Deshabilitar scroll para no interferir con scroll de la página
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapOrigen);
-                    markerOrigen = L.marker([lat, lon]).addTo(mapOrigen);
-                } else {
-                    mapOrigen.setView([lat, lon], 16);
-                    markerOrigen.setLatLng([lat, lon]);
-                }
+                mostrarMapaLeaflet(lat, lon);
             },
             (error) => {
                 alert("No se pudo obtener la ubicación. Verifica los permisos de tu navegador.");
@@ -149,6 +175,23 @@ function captureGPS() {
     } else {
         alert("Tu dispositivo no soporta geolocalización.");
     }
+}
+
+// Función auxiliar para renderizar el mapa sin repetir código
+function mostrarMapaLeaflet(lat, lon) {
+    const mapContainer = document.getElementById('map-origen');
+    mapContainer.style.display = 'block';
+    
+    if (!mapOrigen) {
+        mapOrigen = L.map('map-origen', { scrollWheelZoom: false }).setView([lat, lon], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapOrigen);
+        markerOrigen = L.marker([lat, lon]).addTo(mapOrigen);
+    } else {
+        mapOrigen.setView([lat, lon], 16);
+        markerOrigen.setLatLng([lat, lon]);
+    }
+    // Corregir tamaño del mapa al mostrarlo por primera vez
+    setTimeout(() => mapOrigen.invalidateSize(), 100);
 }
 
 // 2. Envío del Formulario y Lógica Offline

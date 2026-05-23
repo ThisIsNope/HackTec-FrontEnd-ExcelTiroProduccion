@@ -104,8 +104,14 @@
                                 <h5 class="fw-bold text-muted border-bottom pb-2 mb-3">Paso 3: Trazabilidad</h5>
                                 <p class="text-muted small mb-4">Captura el lugar exacto de origen para garantizar la trazabilidad inmutable del lote.</p>
                                 
-                                <!-- Botón para obtener la ubicación por GPS -->
                                 <div class="mb-4">
+                                    <!-- Búsqueda manual de dirección -->
+                                    <div class="input-group mb-2 shadow-sm rounded-pill overflow-hidden border">
+                                        <input type="text" id="address-search" class="form-control border-0 px-4" placeholder="Ej: Blvd V. Carranza, Saltillo">
+                                        <button class="btn btn-primary px-3 fw-bold" type="button" onclick="searchAddress()">🔍 Buscar</button>
+                                    </div>
+                                    <div class="text-center text-muted small fw-bold mb-2">- O -</div>
+                                    <!-- Botón para obtener la ubicación por GPS -->
                                     <button type="button" id="btn-gps" class="btn btn-outline-primary w-100 rounded-pill fw-bold shadow-sm py-2" onclick="captureGPS()">
                                         📍 Obtener mi ubicación exacta (GPS)
                                     </button>

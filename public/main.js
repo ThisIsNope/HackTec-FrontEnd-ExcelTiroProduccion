@@ -1,6 +1,20 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const userStr = sessionStorage.getItem('user');
+    const navLogin = document.getElementById('nav-login');
+    const navAccount = document.getElementById('nav-account');
+    const navLogout = document.getElementById('nav-logout');
+
+    if (userStr) {
+        if (navLogin) navLogin.style.display = 'none';
+        if (navAccount) navAccount.style.display = 'block';
+        if (navLogout) navLogout.style.display = 'block';
+    }
+});
+
 function logout() {
+    sessionStorage.removeItem('user');
     alert('Sesión cerrada');
-    // Aquí podrías agregar lógica para limpiar tokens o redirigir a la página de inicio de sesión
+    window.location.reload(); // Recarga la página para que la vista vuelva a la normalidad
 }
 
 function renderGreenChart() {
