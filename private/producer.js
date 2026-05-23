@@ -112,17 +112,34 @@ function togglePriceField() {
 
 // Captura de Coordenadas GPS
 let currentCoords = null;
+let mapOrigen = null;
+let markerOrigen = null;
+
 function captureGPS() {
     const btn = document.getElementById('btn-gps');
     const status = document.getElementById('gps-status');
-    
     if (navigator.geolocation) {
-        btn.innerText = "⏳ Buscando señal...";
+        btn.innerText = "⏳ Buscando señal de satélite...";
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
                 currentCoords = position.coords;
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
                 btn.style.display = 'none';
-                status.innerText = `✅ Ubicación validada: Lat ${position.coords.latitude.toFixed(4)}, Lon ${position.coords.longitude.toFixed(4)}`;
+                status.innerText = "✅ Ubicación precisa en el mapa.";
+                
+                // 1. Mostrar y configurar el mapa interactivo de Leaflet
+                const mapContainer = document.getElementById('map-origen');
+                mapContainer.style.display = 'block';
+                
+                if (!mapOrigen) {
+                    mapOrigen = L.map('map-origen', { scrollWheelZoom: false }).setView([lat, lon], 16); // Deshabilitar scroll para no interferir con scroll de la página
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapOrigen);
+                    markerOrigen = L.marker([lat, lon]).addTo(mapOrigen);
+                } else {
+                    mapOrigen.setView([lat, lon], 16);
+                    markerOrigen.setLatLng([lat, lon]);
+                }
             },
             (error) => {
                 alert("No se pudo obtener la ubicación. Verifica los permisos de tu navegador.");
@@ -151,6 +168,13 @@ async function handleFormSubmit(event) {
         return;
     }
     const idUsuarios = sessionUser.usuario;
+    
+    // Validar que se haya obtenido la ubicación GPS
+    if (!currentCoords) {
+        alert("Por favor, obtén la ubicación GPS del lote antes de guardar.");
+        btnSubmit.disabled = false;
+        return;
+    }
 
     const idCategoria = getCategoriaId(document.getElementById('category').value);
     const idTipoPublicacion = document.getElementById('transaction-type').value === 'venta' ? 1 : 2;
@@ -159,21 +183,24 @@ async function handleFormSubmit(event) {
     const cantidad = document.getElementById('quantity').value;
     const precio = idTipoPublicacion === 1 ? document.getElementById('price').value : null;
     const unidadMedida = document.getElementById('unit').value;
-    const urlImagen = uploadedImageUrl; // Se enviará la URL Base64 a tu API
+    const urlImagen = uploadedImageUrl;
+    const latitud = currentCoords.latitude;
+    const longitud = currentCoords.longitude;
 
     const API_URL = "https://calamity-hypertext-strenuous.ngrok-free.dev";
 
     try {
         const res = await fetch(`${API_URL}/producto`, {
             method: "POST",
+            // Asegúrate de que tu backend espera este orden y tipos de datos
             headers: {
                 "Content-Type": "application/json",
                 "ngrok-skip-browser-warning": "true"
             },
-            body: JSON.stringify([idCategoria, idTipoPublicacion, idUsuarios, nombre, descripcion, cantidad, precio, unidadMedida, urlImagen])
+            body: JSON.stringify([idCategoria, idTipoPublicacion, idUsuarios, nombre, descripcion, cantidad, precio, unidadMedida, urlImagen, latitud, longitud])
         });
 
-        const data = await res.json();
+        const data = await res.json(); // Se espera que el backend devuelva un objeto JSON
 
         if (data.ok) {
             // 2. Mostrar el modal de QR en lugar de solo un alert
